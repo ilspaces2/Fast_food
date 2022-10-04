@@ -19,4 +19,6 @@ public class Order {
     private User user;
 
     private List<Dish> dishes;
+
+    private OrderStatus status;
 }
