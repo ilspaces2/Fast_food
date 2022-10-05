@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface DishService {
 
-    void add(Dish dish);
+    Dish add(Dish dish);
 
-    void update(Dish dish);
+    Dish update(Dish dish);
 
-    void deleteByName(String dishName);
+    void deleteById(int id);
 
-    Dish findByName(String dishName);
+    Dish findById(int id);
 
     List<Dish> findALL();
 }
