@@ -4,17 +4,18 @@ import ru.fastfood.model.Order;
 import ru.fastfood.model.OrderStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderService {
 
-    void save(Order order);
+    Order save(Order order);
 
     void deleteById(int id);
 
-    Optional<Order> findById(int id);
+    Order findById(int id);
 
     OrderStatus getStatusById(int id);
+
+    void setStatusById(int id, OrderStatus status);
 
     List<Order> findAll();
 }

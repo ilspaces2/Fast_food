@@ -1,24 +1,27 @@
 package ru.fastfood.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@Entity
+@Table(name = "orders")
 public class Order {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private LocalDateTime created;
 
-    private User user;
+    @NotBlank(message = "Email is blank")
+    private String userEmail;
 
-    private List<Dish> dishes;
-
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 }
