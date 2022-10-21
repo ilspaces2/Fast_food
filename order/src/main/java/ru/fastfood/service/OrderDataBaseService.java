@@ -1,6 +1,9 @@
 package ru.fastfood.service;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import ru.fastfood.model.Notification;
+import ru.fastfood.model.NotificationType;
 import ru.fastfood.model.Order;
 import ru.fastfood.model.OrderStatus;
 import ru.fastfood.repository.OrderRepository;
@@ -14,15 +17,20 @@ public class OrderDataBaseService implements OrderService {
 
     private final OrderRepository orderRepository;
 
-    public OrderDataBaseService(OrderRepository orderRepository) {
+    private final KafkaTemplate<Integer, Notification> kafkaTemplate;
+
+    public OrderDataBaseService(OrderRepository orderRepository, KafkaTemplate<Integer, Notification> kafkaTemplate) {
         this.orderRepository = orderRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
     public Order save(Order order) {
         order.setCreated(LocalDateTime.now());
         order.setStatus(OrderStatus.IN_WORK);
-        return orderRepository.save(order);
+        orderRepository.save(order);
+        sendToKafka(order, "New order");
+        return order;
     }
 
     @Override
@@ -55,5 +63,13 @@ public class OrderDataBaseService implements OrderService {
     @Override
     public List<Order> findAll() {
         return (List<Order>) orderRepository.findAll();
+    }
+
+    private void sendToKafka(Order order, String message) {
+        Notification notification = new Notification();
+        notification.setNotificationType(NotificationType.ORDER);
+        notification.setItemIdFromService(order.getId());
+        notification.setMessageText(message);
+        kafkaTemplate.send("messengers", notification);
     }
 }

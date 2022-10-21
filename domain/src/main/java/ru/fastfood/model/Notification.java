@@ -1,16 +1,24 @@
 package ru.fastfood.model;
 
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import javax.persistence.*;
 
 @Data
-@AllArgsConstructor
-@EqualsAndHashCode(of = "email")
+@Entity
+@Table(name = "notification")
 public class Notification {
 
-    private String text;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    private String email;
+    @Enumerated(EnumType.STRING)
+    private NotificationType notificationType;
+
+
+    private int itemIdFromService;
+
+    private String messageText;
+
 }

@@ -1,6 +1,6 @@
 create table orders(
     id          serial primary key,
     created     timestamp,
-    userEmail   text,
+    user_email   text,
     status      text
 );
