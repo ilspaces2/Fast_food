@@ -10,7 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.fastfood.model.Order;
-import ru.fastfood.model.OrderStatus;
+import ru.fastfood.model.Status;
 import ru.fastfood.service.OrderDataBaseService;
 
 import java.text.SimpleDateFormat;
@@ -48,7 +48,7 @@ class OrderControllerTest {
         orderOutput.setId(1);
         orderOutput.setUserEmail("email");
         orderOutput.setCreated(LocalDateTime.now());
-        orderOutput.setStatus(OrderStatus.IN_WORK);
+        orderOutput.setStatus(Status.IN_WORK);
         when(orderDataBaseService.save(any(Order.class))).thenReturn(orderOutput);
         this.mockMvc.perform(post("/order")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,17 +102,17 @@ class OrderControllerTest {
 
     @Test
     public void whenGetStatus() throws Exception {
-        when(orderDataBaseService.getStatusById(any(Integer.class))).thenReturn(OrderStatus.COMPLETE);
+        when(orderDataBaseService.getStatusById(any(Integer.class))).thenReturn(Status.COMPLETE);
         this.mockMvc.perform(get("/order/getStatus/{id}", 1))
                 .andExpect(status().isOk())
-                .andExpect(content().string(equalTo(mapper().writeValueAsString(OrderStatus.COMPLETE))));
+                .andExpect(content().string(equalTo(mapper().writeValueAsString(Status.COMPLETE))));
     }
 
     @Test
     public void whenSetStatus() throws Exception {
-        doNothing().when(orderDataBaseService).setStatusById(any(Integer.class), any(OrderStatus.class));
+        doNothing().when(orderDataBaseService).setStatusById(any(Integer.class), any(Status.class));
         this.mockMvc.perform(patch("/order/setStatus/{id}", 1)
-                        .param("status", String.valueOf(OrderStatus.COMPLETE)))
+                        .param("status", String.valueOf(Status.COMPLETE)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalTo("Status changed")));
     }

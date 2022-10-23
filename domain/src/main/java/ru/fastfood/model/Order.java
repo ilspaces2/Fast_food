@@ -23,5 +23,5 @@ public class Order {
     private String userEmail;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private Status status;
 }

@@ -6,19 +6,15 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "notification")
-public class Notification {
+@Table(name = "kitchen")
+public class Kitchen {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationType notificationType;
-
-    private int itemIdFromService;
+    private int orderId;
 
     @Enumerated(EnumType.STRING)
     private Status status;
-
 }

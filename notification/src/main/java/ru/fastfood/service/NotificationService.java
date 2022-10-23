@@ -3,6 +3,7 @@ package ru.fastfood.service;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import ru.fastfood.model.Status;
 import ru.fastfood.repository.NotificationRepository;
 import ru.fastfood.model.Notification;
 
@@ -19,8 +20,17 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
+    public void setStatusByItemIdFromService(int id, Status status) {
+        notificationRepository.setStatusByItemIdFromService(id, status);
+    }
+
     @KafkaListener(topics = "messengers")
-    public void listenAndSaveMessage(ConsumerRecord<Integer, Notification> input) {
-        save(input.value());
+    public void listenMessage(ConsumerRecord<Integer, Notification> input) {
+        Notification notification = input.value();
+        if (Status.NEW.equals(notification.getStatus())) {
+            save(input.value());
+        } else {
+            setStatusByItemIdFromService(notification.getItemIdFromService(), notification.getStatus());
+        }
     }
 }

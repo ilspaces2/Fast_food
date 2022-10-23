@@ -1,7 +1,9 @@
 package ru.fastfood.model;
 
-public enum OrderStatus {
+public enum Status {
+    NEW,
     IN_WORK,
     DELIVERING,
-    COMPLETE
+    COMPLETE,
+    CANCELED
 }

@@ -4,13 +4,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.fastfood.model.Notification;
+import ru.fastfood.model.Kitchen;
 import ru.fastfood.model.Status;
 
-public interface NotificationRepository extends CrudRepository<Notification, Integer> {
+public interface KitchenRepository extends CrudRepository<Kitchen, Integer> {
 
     @Modifying
     @Transactional()
-    @Query("update Notification set status=?2 where itemIdFromService=?1")
-    void setStatusByItemIdFromService(int id, Status status);
+    @Query("update Kitchen set status=?2 where orderId=?1")
+    void setStatusByOrderId(int id, Status status);
 }
+

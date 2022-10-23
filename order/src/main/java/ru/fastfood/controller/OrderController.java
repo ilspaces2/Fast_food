@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.fastfood.model.Order;
-import ru.fastfood.model.OrderStatus;
+import ru.fastfood.model.Status;
 import ru.fastfood.service.OrderService;
 
 import javax.validation.Valid;
@@ -42,12 +42,12 @@ public class OrderController {
     }
 
     @GetMapping("/getStatus/{id}")
-    public OrderStatus getOrderStatus(@PathVariable int id) {
+    public Status getOrderStatus(@PathVariable int id) {
         return orderService.getStatusById(id);
     }
 
     @PatchMapping("/setStatus/{id}")
-    public ResponseEntity<String> setOrderStatus(@PathVariable int id, @RequestParam OrderStatus status) {
+    public ResponseEntity<String> setOrderStatus(@PathVariable int id, @RequestParam Status status) {
         orderService.setStatusById(id, status);
         return new ResponseEntity<>("Status changed", HttpStatus.OK);
     }

@@ -1,14 +1,17 @@
 package ru.fastfood.service;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.fastfood.model.Notification;
 import ru.fastfood.model.NotificationType;
 import ru.fastfood.model.Order;
-import ru.fastfood.model.OrderStatus;
+import ru.fastfood.model.Status;
 import ru.fastfood.repository.OrderRepository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -27,9 +30,10 @@ public class OrderDataBaseService implements OrderService {
     @Override
     public Order save(Order order) {
         order.setCreated(LocalDateTime.now());
-        order.setStatus(OrderStatus.IN_WORK);
+        order.setStatus(Status.IN_WORK);
         orderRepository.save(order);
-        sendToKafka(order, "New order");
+        sendToKafka(order.getId(), "messengers", Status.NEW);
+        sendToKafka(order.getId(), "preorder", Status.NEW);
         return order;
     }
 
@@ -46,16 +50,16 @@ public class OrderDataBaseService implements OrderService {
     }
 
     @Override
-    public OrderStatus getStatusById(int id) {
+    public Status getStatusById(int id) {
         return findById(id).getStatus();
     }
 
     @Override
-    public void setStatusById(int id, OrderStatus status) {
-        if (!OrderStatus.IN_WORK.equals(status) && !OrderStatus.DELIVERING.equals(status)
-                && !OrderStatus.COMPLETE.equals(status)) {
-            throw new IllegalArgumentException("Status incorrect");
-        }
+    public void setStatusById(int id, Status status) {
+        Arrays.stream(Status.values())
+                .filter((st) -> st.equals(status))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Status incorrect"));
         findById(id);
         orderRepository.setStatusOrder(id, status);
     }
@@ -65,11 +69,18 @@ public class OrderDataBaseService implements OrderService {
         return (List<Order>) orderRepository.findAll();
     }
 
-    private void sendToKafka(Order order, String message) {
+    private void sendToKafka(int orderId, String topic, Status status) {
         Notification notification = new Notification();
         notification.setNotificationType(NotificationType.ORDER);
-        notification.setItemIdFromService(order.getId());
-        notification.setMessageText(message);
-        kafkaTemplate.send("messengers", notification);
+        notification.setItemIdFromService(orderId);
+        notification.setStatus(status);
+        kafkaTemplate.send(topic, notification);
+    }
+
+    @KafkaListener(topics = "cooked_order")
+    public void listenKitchen(ConsumerRecord<Integer, Notification> input) {
+        Notification notification = input.value();
+        setStatusById(notification.getItemIdFromService(), notification.getStatus());
+        sendToKafka(notification.getItemIdFromService(), "messengers", notification.getStatus());
     }
 }
